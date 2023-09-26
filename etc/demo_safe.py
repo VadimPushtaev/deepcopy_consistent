@@ -1,22 +1,28 @@
 import threading
-from copy import copy
 
-from deepcopy_consistent import ConsistentlyCopyableDict
+from thread_safe_dict import ThreadSafeDict
 
-N = 2000000
+N = 2
+
+
+def copy_naive(d: dict) -> dict:
+    result = {}
+    for key in d.keys():
+        result[key] = d[key]
+
+    return result
 
 
 def writer(d, reader_stopped):
     while not reader_stopped.is_set():
-        d["for"] = True
         for i in range(N):
             d[i] += 1
-        del d["for"]
 
 
 def reader(d, reader_stopped):
     while True:
-        cpy = copy(d)
+        cpy = copy_naive(d)
+        print(cpy)
         prev = None
         for i in range(N):
             if prev is not None:
@@ -28,7 +34,7 @@ def reader(d, reader_stopped):
 
 
 def main():
-    d = ConsistentlyCopyableDict({i: 0 for i in range(N)})
+    d = ThreadSafeDict({i: 0 for i in range(N)})
     reader_stopped = threading.Event()
 
     threads = [

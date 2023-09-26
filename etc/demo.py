@@ -1,7 +1,15 @@
 import threading
-from copy import deepcopy
 
 N = 2
+
+
+def copy_naive(d: dict) -> dict:
+    result = {}
+    for key in d.keys():
+        result[key] = d[key]
+
+    return result
+
 
 
 def writer(d, reader_stopped):
@@ -14,7 +22,7 @@ def writer(d, reader_stopped):
 
 def reader(d, reader_stopped):
     while True:
-        cpy = deepcopy(d)
+        cpy = copy_naive(d)
         prev = None
         for i in range(N):
             if prev is not None:
